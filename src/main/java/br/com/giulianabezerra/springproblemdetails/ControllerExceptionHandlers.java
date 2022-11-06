@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,7 +18,10 @@ public class ControllerExceptionHandlers {
     PrintWriter pw = new PrintWriter(sw);
     exception.printStackTrace(pw);
 
+    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        HttpStatus.valueOf(409), sw.toString());
+    problemDetail.setTitle(exception.getMessage());
     return ResponseEntity.status(HttpStatus.CONFLICT)
-        .body(new ErrorResponse(exception.getMessage(), sw.toString()));
+        .body(problemDetail);
   }
 }
